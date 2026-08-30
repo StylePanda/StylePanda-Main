@@ -4,42 +4,134 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>StylePanda – Projekte und Dienste</title>
-    <meta name="description" content="StylePanda ist die zentrale Übersicht meiner Projekte und Dienste.">
+    <title>StylePanda – Projekte, Dienste und eigene Tools</title>
+    <meta name="description" content="StylePanda bündelt private Webprojekte, selbst gehostete Dienste und eigene Softwareprojekte an einem zentralen Ort.">
     <link rel="canonical" href="https://stylepanda.me/">
 
     <meta property="og:type" content="website">
     <meta property="og:locale" content="de_DE">
     <meta property="og:site_name" content="StylePanda">
-    <meta property="og:title" content="StylePanda – Projekte und Dienste">
-    <meta property="og:description" content="Zentrale Übersicht meiner Projekte und Dienste.">
+    <meta property="og:title" content="StylePanda – Projekte, Dienste und eigene Tools">
+    <meta property="og:description" content="Eine zentrale Übersicht meiner Projekte, Dienste und selbst entwickelten Tools.">
     <meta property="og:url" content="https://stylepanda.me/">
 
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="StylePanda – Projekte und Dienste">
-    <meta name="twitter:description" content="Zentrale Übersicht meiner Projekte und Dienste.">
+    <meta name="twitter:title" content="StylePanda – Projekte, Dienste und eigene Tools">
+    <meta name="twitter:description" content="Eine zentrale Übersicht meiner Projekte, Dienste und selbst entwickelten Tools.">
 
     <link rel="stylesheet" href="/assets/css/main.css">
 </head>
-<body>
+<body id="startseite">
     <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
 
     <header class="site-header">
-        <div class="container">
-            <a class="site-name" href="/" aria-label="StylePanda Startseite">StylePanda</a>
+        <div class="container header-inner">
+            <a class="site-name" href="#startseite" aria-label="StylePanda Startseite">
+                <span class="brand-dot" aria-hidden="true"></span>
+                StylePanda
+            </a>
+
+            <nav class="site-nav" aria-label="Hauptnavigation">
+                <ul>
+                    <li><a href="#projekte">Projekte</a></li>
+                    <li><a href="#dienste">Dienste</a></li>
+                    <li><a href="#ueber">Über StylePanda</a></li>
+                </ul>
+            </nav>
         </div>
     </header>
 
-    <main id="main-content" class="site-main">
-        <div class="container intro">
-            <h1>StylePanda</h1>
-            <p>Zentrale Übersicht meiner Projekte und Dienste.</p>
-        </div>
+    <main id="main-content">
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="container hero-grid">
+                <div class="hero-copy">
+                    <p class="section-label"><span aria-hidden="true"></span> Private Projekte &amp; Dienste</p>
+                    <h1 id="hero-title">StylePanda</h1>
+                    <p class="hero-lead">Eine zentrale Übersicht meiner Projekte, Dienste und selbst entwickelten Tools.</p>
+                    <a class="button-link" href="#projekte">Projekte ansehen</a>
+                </div>
+
+                <div class="hero-visual" aria-hidden="true">
+                    <div class="visual-orbit visual-orbit-outer"></div>
+                    <div class="visual-orbit visual-orbit-inner"></div>
+                    <div class="visual-core">SP</div>
+                    <div class="visual-node visual-node-projects">Projekte</div>
+                    <div class="visual-node visual-node-services">Dienste</div>
+                    <div class="visual-node visual-node-tools">Tools</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="projekte" class="content-section" aria-labelledby="projects-title">
+            <div class="container">
+                <div class="section-heading">
+                    <p class="section-label">Ausgewählt</p>
+                    <h2 id="projects-title">Projekte</h2>
+                    <p>Eigene Anwendungen, die aus konkreten Anforderungen entstanden sind.</p>
+                </div>
+
+                <div class="project-grid">
+                    <article class="project-card">
+                        <div class="project-monogram" aria-hidden="true">BM</div>
+                        <div class="project-content">
+                            <div class="card-meta">
+                                <span class="category">Webprojekt</span>
+                                <span class="status status-active"><span aria-hidden="true"></span>Aktiv</span>
+                            </div>
+                            <h3>BrickMissing</h3>
+                            <p>Private LEGO-Sammlungsverwaltung für Sets, Teile, Fehlteile, Minifiguren, Inventar, Wishlist und Organisation.</p>
+                        </div>
+                        <a class="card-link" href="https://brickmissing.stylepanda.me/">BrickMissing öffnen</a>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="dienste" class="content-section section-secondary" aria-labelledby="services-title">
+            <div class="container">
+                <div class="section-heading">
+                    <p class="section-label">Infrastruktur</p>
+                    <h2 id="services-title">Dienste</h2>
+                    <p>Öffentlich verfügbare, selbst gehostete Dienste werden hier gebündelt.</p>
+                </div>
+
+                <div class="empty-state">
+                    <span class="empty-state-mark" aria-hidden="true"></span>
+                    <div>
+                        <h3>Noch keine öffentlichen Dienste</h3>
+                        <p>Weitere Dienste werden ergänzt, sobald sie öffentlich verfügbar sind.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="ueber" class="content-section about-section" aria-labelledby="about-title">
+            <div class="container about-grid">
+                <p class="section-label">Hinter dem Projekt</p>
+                <div class="about-copy">
+                    <h2 id="about-title">Über StylePanda</h2>
+                    <p>StylePanda bündelt private Webprojekte, selbst gehostete Dienste und eigene Softwareprojekte an einem zentralen Ort.</p>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 StylePanda</p>
+        <div class="container footer-grid">
+            <div>
+                <a class="site-name footer-brand" href="#startseite">
+                    <span class="brand-dot" aria-hidden="true"></span>
+                    StylePanda
+                </a>
+                <p class="copyright">&copy; 2026 StylePanda</p>
+            </div>
+
+            <nav class="footer-nav" aria-label="Footer-Navigation">
+                <a href="#startseite">Startseite</a>
+                <a href="#projekte">Projekte</a>
+                <a href="#dienste">Dienste</a>
+                <a href="https://brickmissing.stylepanda.me/impressum/">Impressum</a>
+            </nav>
         </div>
     </footer>
 </body>

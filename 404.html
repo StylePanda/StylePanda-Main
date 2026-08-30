@@ -8,27 +8,37 @@
     <meta name="description" content="Die angeforderte StylePanda-Seite wurde nicht gefunden.">
     <link rel="stylesheet" href="/assets/css/main.css">
 </head>
-<body>
+<body class="error-page">
     <a class="skip-link" href="#main-content">Zum Inhalt springen</a>
 
     <header class="site-header">
-        <div class="container">
-            <a class="site-name" href="/" aria-label="StylePanda Startseite">StylePanda</a>
+        <div class="container header-inner">
+            <a class="site-name" href="/" aria-label="StylePanda Startseite">
+                <span class="brand-dot" aria-hidden="true"></span>
+                StylePanda
+            </a>
         </div>
     </header>
 
-    <main id="main-content" class="site-main">
-        <div class="container intro">
-            <p class="eyebrow">Fehler 404</p>
-            <h1>Seite nicht gefunden</h1>
-            <p>Die angeforderte Seite existiert nicht oder wurde verschoben.</p>
-            <p><a href="/">Zurück zur Startseite</a></p>
+    <main id="main-content" class="error-main">
+        <div class="container">
+            <div class="error-panel">
+                <div class="error-code" aria-hidden="true">404</div>
+                <p class="section-label">Nicht gefunden</p>
+                <h1>Diese Seite gibt es nicht.</h1>
+                <p>Der aufgerufene Inhalt wurde möglicherweise verschoben oder ist nicht mehr verfügbar.</p>
+                <a class="button-link" href="/">Zurück zur Startseite</a>
+            </div>
         </div>
     </main>
 
     <footer class="site-footer">
-        <div class="container">
-            <p>&copy; 2026 StylePanda</p>
+        <div class="container footer-grid footer-grid-compact">
+            <p class="copyright">&copy; 2026 StylePanda</p>
+            <nav class="footer-nav" aria-label="Footer-Navigation">
+                <a href="/">Startseite</a>
+                <a href="https://brickmissing.stylepanda.me/impressum/">Impressum</a>
+            </nav>
         </div>
     </footer>
 </body>
