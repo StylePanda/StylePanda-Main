@@ -11,6 +11,9 @@ readonly LOCK_FILE="${APP_ROOT}/deploy.lock"
 readonly REMOTE="origin"
 readonly BRANCH="main"
 readonly EXPECTED_REPOSITORY="StylePanda/StylePanda-Main"
+readonly SSH_CONFIG="/home/simon/.ssh/config"
+readonly SSH_KNOWN_HOSTS="/home/simon/.ssh/known_hosts"
+readonly GIT_SSH_COMMAND_VALUE="ssh -F ${SSH_CONFIG} -o UserKnownHostsFile=${SSH_KNOWN_HOSTS}"
 readonly RETAIN_RELEASES=5
 readonly RELEASE_NAME_PATTERN='^[0-9]{14}-[0-9a-f]{7,40}$'
 
@@ -148,6 +151,11 @@ trap 'log "ERROR" "Deployment interrupted"; exit 130' INT TERM
 
 git_repo() {
     git -c safe.directory="$REPO_DIR" -C "$REPO_DIR" "$@"
+}
+
+git_network() {
+    GIT_SSH_COMMAND="$GIT_SSH_COMMAND_VALUE" \
+        git -c safe.directory="$REPO_DIR" -C "$REPO_DIR" "$@"
 }
 
 validate_release() {
@@ -303,7 +311,7 @@ main() {
 
     [[ "$EUID" -eq 0 ]] || die "Run this deployment with sudo/root privileges"
 
-    for command_name in basename curl date dirname find flock git grep ln mkdir mv readlink realpath rm sort tar; do
+    for command_name in basename curl date dirname find flock git grep ln mkdir mv readlink realpath rm sort ssh tar; do
         require_command "$command_name"
     done
 
@@ -344,8 +352,14 @@ main() {
     current_head="$(git_repo rev-parse --verify HEAD)"
     log "INFO" "Repository before fetch: branch=${current_branch}, commit=${current_head}"
 
+    [[ -f "$SSH_CONFIG" && -r "$SSH_CONFIG" ]] \
+        || die "Dedicated SSH config is missing or unreadable: $SSH_CONFIG"
+    [[ -f "$SSH_KNOWN_HOSTS" && -r "$SSH_KNOWN_HOSTS" ]] \
+        || die "Dedicated SSH known_hosts is missing or unreadable: $SSH_KNOWN_HOSTS"
+    log "INFO" "Dedicated Git SSH configuration validated"
+
     log "INFO" "Fetching ${REMOTE}/${BRANCH}"
-    git_repo fetch --prune "$REMOTE" "$BRANCH"
+    git_network fetch --prune "$REMOTE" "$BRANCH"
     target_commit="$(git_repo rev-parse --verify "refs/remotes/${REMOTE}/${BRANCH}^{commit}")"
 
     if git_repo show-ref --verify --quiet "refs/heads/${BRANCH}"; then

@@ -89,7 +89,7 @@ Dieser Installationsschritt startet kein Deployment. Wenn `scripts/deploy.sh` sp
 5. `sudo /var/www/stylepanda-app/deploy.sh` ausführen.
 6. Erfolgsstatus, aufgelösten `current`-Pfad und die Website prüfen.
 
-Das Script setzt voraus, dass der Server-Checkout bereits mit GitHub authentifiziert ist. Zugangsdaten gehören weder in das Script noch in dieses Repository.
+Der mit root ausgeführte Deployment-Prozess verwendet für Git-Netzwerkzugriffe die bestehende dedizierte StylePanda-SSH-Konfiguration `/home/simon/.ssh/config` und die Host-Key-Datei `/home/simon/.ssh/known_hosts`. Dadurch bleibt der Remote-Alias `github-stylepanda-main` nutzbar; eine zusätzliche `/root/.ssh`-Konfiguration oder das Kopieren des privaten Schlüssels ist nicht erforderlich. Zugangsdaten und private Schlüssel gehören weder in das Script noch in dieses Repository.
 
 ### Manueller Rollback
 
