@@ -18,9 +18,11 @@ Die technische Basis ist eine statische Website aus HTML5 und CSS. Sie benötigt
 ├── 404.html
 ├── robots.txt
 ├── sitemap.xml
-└── assets/
-    ├── css/main.css
-    └── icons/README.md
+├── assets/
+│   ├── css/main.css
+│   └── icons/README.md
+└── scripts/
+    └── deploy.sh
 ```
 
 Der Icon-Pfad ist für ein später freigegebenes StylePanda-Favicon reserviert. Solange kein echtes Marken-Asset vorliegt, bindet die Website kein Favicon und kein Social-Preview-Bild ein.
@@ -35,17 +37,82 @@ python -m http.server 8000
 
 Danach ist die Startseite unter `http://localhost:8000/` erreichbar. Es müssen keine Abhängigkeiten installiert werden.
 
-## Deployment-Grundidee
+## Deployment
 
 GitHub bleibt die Source of Truth:
 
 ```text
-PC/Codex -> GitHub -> Production Server
+PC/Codex -> Git Commit -> GitHub main -> Production Server -> deploy.sh
 ```
 
-Production ist noch nicht automatisch mit diesem Repository verbunden. Ein Deployment-Script wäre ohne bekannte Serveradresse, Zielpfad, Benutzer- und Freigaberegeln nicht sicher reproduzierbar und ist deshalb bewusst nicht enthalten. Der spätere Ablauf soll einen geprüften Stand von `main` serverseitig beziehen, in einen bekannten Document Root veröffentlichen, validieren und nginx nur bei tatsächlich geänderter Konfiguration kontrolliert neu laden. Direkte Deployments vom Entwicklungs-PC an GitHub vorbei sind nicht vorgesehen.
+Der manuell auf dem Server gestartete Ablauf liegt versioniert unter `scripts/deploy.sh`. Das Script prüft den dedizierten Checkout, aktualisiert ihn exakt auf `origin/main`, exportiert ausschließlich die öffentlichen Website-Dateien per `git archive`, validiert einen neuen Release, schaltet den `current`-Symlink atomar um und führt Production-Smoke-Checks aus.
 
-Noch zu klären sind Repository-Zugriff auf dem Server, Document Root, Eigentümer/Rechte, atomarer Release-Ablauf beziehungsweise Rollback und die vorhandene nginx-Konfiguration.
+Serverstruktur:
+
+```text
+/var/www/stylepanda-app/
+├── deploy.sh
+├── deploy.lock
+├── repo/                 # dedizierter Checkout von GitHub main
+├── releases/             # YYYYMMDDHHMMSS-<commit>
+└── current -> releases/<aktiver-release>
+```
+
+Ein normales Deployment wird ausschließlich auf dem Server gestartet:
+
+```bash
+sudo /var/www/stylepanda-app/deploy.sh
+```
+
+Parallele Deployments werden mit `flock` verhindert. Bei einem Fehler vor dem Umschalten bleibt `current` unverändert; schlägt ein verpflichtender Smoke Check danach fehl, wird auf das zuvor aktive Release zurückgeschaltet. Nach Erfolg bleiben bis zu fünf verwaltete Releases erhalten, wobei der aktuelle und der unmittelbar vorherige Release geschützt sind. Fremd benannte Verzeichnisse unter `releases/` werden nicht gelöscht.
+
+Für statische Releases ist kein nginx-Reload notwendig. Das Script verändert weder nginx noch TLS, DNS, Benutzerrechte oder Eigentümer.
+
+### Einmalige Installation
+
+Nach Prüfung und Merge des Scripts muss der Production-Checkout zunächst kontrolliert auf `origin/main` gebracht werden. Anschließend wird die geprüfte Datei mit Root-Eigentum und ausführbaren, aber nicht global schreibbaren Rechten installiert:
+
+```bash
+sudo install --owner=root --group=root --mode=0755 \
+  /var/www/stylepanda-app/repo/scripts/deploy.sh \
+  /var/www/stylepanda-app/deploy.sh
+```
+
+Dieser Installationsschritt startet kein Deployment. Wenn `scripts/deploy.sh` später geändert wird, muss die neue Version erneut geprüft und bewusst installiert werden; das Deployment-Script ersetzt sich nicht selbst.
+
+### Erstes Production-Deployment
+
+1. Lokale Änderungen prüfen, committen und nach `GitHub main` pushen.
+2. Auf dem Server sicherstellen, dass `/var/www/stylepanda-app/repo` der dedizierte, saubere Checkout von `StylePanda/StylePanda-Main` ist.
+3. Den Checkout einmalig auf den geprüften Stand von `origin/main` bringen.
+4. `scripts/deploy.sh` mit dem oben dokumentierten `install`-Befehl installieren.
+5. `sudo /var/www/stylepanda-app/deploy.sh` ausführen.
+6. Erfolgsstatus, aufgelösten `current`-Pfad und die Website prüfen.
+
+Das Script setzt voraus, dass der Server-Checkout bereits mit GitHub authentifiziert ist. Zugangsdaten gehören weder in das Script noch in dieses Repository.
+
+### Manueller Rollback
+
+Ein Release wird nie geraten oder hartcodiert. Als Root zuerst die vorhandenen verwalteten Releases anzeigen und anschließend bewusst einen Eintrag auswählen:
+
+```bash
+sudo -i
+APP_ROOT=/var/www/stylepanda-app
+RELEASES_DIR=/var/www/stylepanda-app/releases
+find "$RELEASES_DIR" -mindepth 1 -maxdepth 1 -type d -printf '%f\n' | sort -r
+read -r -p "Release auswählen: " RELEASE
+[[ "$RELEASE" =~ ^[0-9]{14}-[0-9a-f]{7,40}$ ]] || { echo "Ungültiger Release-Name"; exit 1; }
+TARGET="$RELEASES_DIR/$RELEASE"
+[[ -d "$TARGET" ]] || { echo "Release nicht gefunden"; exit 1; }
+TEMP_LINK="$APP_ROOT/.current.rollback.$$"
+ln -s -- "$TARGET" "$TEMP_LINK"
+mv -Tf -- "$TEMP_LINK" "$APP_ROOT/current"
+[[ "$(readlink -f -- "$APP_ROOT/current")" == "$TARGET" ]] || { echo "Symlink-Prüfung fehlgeschlagen"; exit 1; }
+curl --fail --silent --show-error https://stylepanda.me/ >/dev/null
+exit
+```
+
+Danach die sichtbaren Kerninhalte der Website prüfen. Der Rollback verändert nur den `current`-Symlink; er führt keinen nginx-Reload aus und löscht keinen Release.
 
 ## Empfohlene nginx-Ergänzungen
 
